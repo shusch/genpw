@@ -8,33 +8,40 @@ import (
 )
 
 const (
-	letters           = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	specialCharacters = "!@#$%^&*()-_=+[]{}|;:,.<>/?"
+	letters      = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	specialChars = "!@#$%^&*()-_=+[]{}|;:,.<>/?"
 )
 
 func run() int {
-	opts := parseOptions()
+	opts, err := parseOptions()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		return 1
+	}
 
 	s := ""
 	if opts.symbol {
-		s = letters + specialCharacters
+		s = letters + specialChars
 	} else {
 		s = letters
 	}
 	c := int64(len(s))
 
-	buf := make([]byte, opts.digits)
+	buf := make([][]byte, opts.num)
 
-	for i := 0; i < opts.digits; i++ {
-		r, err := rand.Int(rand.Reader, big.NewInt(c))
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "%v\n", err)
-			return 1
+	for i := 0; i < opts.num; i++ {
+		buf[i] = make([]byte, opts.digits)
+		for j := 0; j < opts.digits; j++ {
+			r, err := rand.Int(rand.Reader, big.NewInt(c))
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "%v\n", err)
+				return 1
+			}
+			buf[i][j] = s[r.Int64()]
 		}
-		buf[i] = s[r.Int64()]
+		fmt.Println(string(buf[i]))
 	}
 
-	fmt.Println(string(buf))
 	return 0
 }
 
