@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"strconv"
 )
 
 const (
@@ -25,11 +26,25 @@ func run() int {
 	} else {
 		s = letters
 	}
-	c := int64(len(s))
 
+	c := int64(len(s))
 	buf := make([][]byte, opts.num)
 
 	for i := 0; i < opts.num; i++ {
+		// Print password delimeter
+		if i != 0 {
+			if opts.delimeter != "" {
+				unquotedDelimeter, err := strconv.Unquote(`"` + opts.delimeter + `"`)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "%v\n", err)
+					return 1
+				}
+				fmt.Print(unquotedDelimeter)
+			} else {
+				fmt.Println()
+			}
+		}
+
 		buf[i] = make([]byte, opts.digits)
 		for j := 0; j < opts.digits; j++ {
 			r, err := rand.Int(rand.Reader, big.NewInt(c))
@@ -39,8 +54,10 @@ func run() int {
 			}
 			buf[i][j] = s[r.Int64()]
 		}
-		fmt.Println(string(buf[i]))
+
+		fmt.Print(string(buf[i]))
 	}
+	fmt.Println()
 
 	return 0
 }
