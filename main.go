@@ -12,16 +12,21 @@ const (
 	specialCharacters = "!@#$%^&*()-_=+[]{}|;:,.<>/?"
 )
 
-var digits = 8
-
 func run() int {
-	s := letters + specialCharacters
-	c := len(s)
+	opts := parseOptions()
 
-	buf := make([]byte, c)
+	s := ""
+	if opts.symbol {
+		s = letters + specialCharacters
+	} else {
+		s = letters
+	}
+	c := int64(len(s))
 
-	for i := 0; i < digits; i++ {
-		r, err := rand.Int(rand.Reader, big.NewInt(int64(c)))
+	buf := make([]byte, opts.digits)
+
+	for i := 0; i < opts.digits; i++ {
+		r, err := rand.Int(rand.Reader, big.NewInt(c))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "%v\n", err)
 			return 1
